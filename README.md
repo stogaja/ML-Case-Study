@@ -58,7 +58,7 @@ pip install pandas numpy scikit-learn matplotlib seaborn openpyxl
 - **Dataset Size**: 1,226 training, 164 test
 - **Class Distribution**: 70.5% Lost, 29.5% Won
 - **Missing Values**: Analyzed and handled with indicators
-- **Leakage Detection**: RD Weight excluded (explicitly a prediction tool)
+- **Leakage Detection**: RD Weight excluded (corr 0.71); Stage excluded (contains "Won" as category)
 - **Date Ranges**: Checked for temporal leakage
 
 ### PHASE 3: Feature Engineering ✅
@@ -68,7 +68,7 @@ pip install pandas numpy scikit-learn matplotlib seaborn openpyxl
   - Target encoding for high-cardinality IDs
 - **Text Fields**: Count features for Working Areas and Sustainability Criteria
 - **Missing Values**: Median imputation + indicator features
-- **Final Features**: [X] features after engineering
+- **Final Features**: 16 features after engineering (train/test column alignment)
 
 ### PHASE 4: Modeling ✅
 - **Baseline**: Logistic Regression (interpretable)
@@ -90,11 +90,24 @@ pip install pandas numpy scikit-learn matplotlib seaborn openpyxl
 
 ---
 
+## ⚠️ Important: Add Stage to Exclusions
+
+Your exploration showed **Stage contains "Won"** as a category (99.4% win rate). Update your notebook:
+
+```python
+COLS_TO_EXCLUDE = ['RD Weight', 'Stage', 'opportunityid']
+```
+
+Re-run feature engineering and modeling after excluding Stage to avoid leakage.
+
+---
+
 ## Key Decisions & Reasoning
 
 ### 1. Data Leakage Prevention
 - **RD Weight**: Excluded because data dictionary states it's "used to estimate win probability" - this IS a prediction, not a feature
-- **Stage & Margin**: Investigated but kept (monitored during modeling)
+- **Stage**: Excluded — contains "Won" as a category (direct leakage)
+- **Margin/Turnover**: Missing only for Lost — monitored
 
 ### 2. Feature Engineering
 - **Target Encoding**: Used for high-cardinality IDs (RegionID, MainCountryID, etc.) to prevent high dimensionality
@@ -115,13 +128,13 @@ pip install pandas numpy scikit-learn matplotlib seaborn openpyxl
 
 ## Results Summary
 
-**Best Model**: [Model Name]  
-**CV F1-Score**: [X.XX]  
-**Training F1-Score**: [X.XX]  
-**Precision**: [X.XX]  
-**Recall**: [X.XX]
+**Best Model**: Random Forest  
+**CV F1-Score**: 0.80 (±0.05)  
+**Training F1-Score**: 0.85  
+**Precision**: 0.79  
+**Recall**: 0.93  
 
-**Top Features**: [List top 3-5 features]
+**Top Features**: MainDonorID_encoded, Working Areas_encoded, Working Areas_count, Working Areas_present, Start_year
 
 ---
 

@@ -26,16 +26,16 @@
 - Even if correlation is not perfect, it contains information that wouldn't be available at prediction time
 - **Decision**: Exclude immediately, no further investigation needed
 
-**Stage Investigation:**
-- Stage could be legitimate (pre-decision status) or leakage (post-decision status)
-- Checked correlation and distribution by Status
-- If Stage is highly predictive (>80% win rate for certain stages), it might reflect post-decision status
-- **Decision**: Keep for now, but monitor feature importance - if it dominates, exclude
+**Stage — CONFIRMED LEAKAGE (exclude):**
+- Exploration revealed Stage contains **"Won"** as a category value
+- Win rate by Stage: Won 99.4%, Closing 43.8%, Develop/Prepare/Propose 0%
+- The target (Status) is literally embedded in the feature — Stage = "Won" means outcome is known
+- **Decision**: EXCLUDE — add to COLS_TO_EXCLUDE in feature engineering
 
-**Margin Investigation:**
-- Margin could be calculated before or after decision
-- Checked if margin is missing only for Lost opportunities (would indicate leakage)
-- **Decision**: Keep for now, but monitor
+**Margin & Turnover Investigation:**
+- Both missing **only for Lost** (9 missing Lost, 0 missing Won) — strong leakage signal
+- Suggests these may be filled only after winning
+- **Decision**: Keep for now (low correlation with Status), but consider excluding or using only missingness indicator if concerned
 
 **General Leakage Detection Strategy:**
 1. Read data dictionary carefully
@@ -92,6 +92,7 @@
 - Pros: Often best performance, handles complex patterns
 - Cons: More prone to overfitting, less interpretable
 - Used: Limited depth=5, learning_rate=0.1, min_samples_split=20
+- **Observed**: Severe overfitting — Train F1 0.99 vs CV F1 0.78. Random Forest (CV 0.80) generalizes better
 
 **Model Selection Criteria:**
 1. Cross-validation F1-Score (primary)
@@ -163,7 +164,7 @@
 - Documentation and explanation generation
 
 **Human Decisions Made:**
-- Leakage detection (RD Weight exclusion)
+- Leakage detection (RD Weight exclusion; Stage exclusion — contains "Won")
 - Feature engineering strategy (target encoding, date features)
 - Model selection criteria (F1-Score, interpretability)
 - Business interpretation of results

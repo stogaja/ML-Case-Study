@@ -27,8 +27,10 @@
 ## Slide 2: Data Exploration & Leakage Prevention (3-4 min)
 
 ### Content:
-- **Critical Finding**: RD Weight excluded (explicitly described as "win probability estimate" - data leakage)
-- **Investigated**: Stage and Margin (kept but monitored)
+- **Critical Findings — Leakage**:
+  - **RD Weight**: Excluded (correlation 0.71 with Status; explicitly a "win probability estimate")
+  - **Stage**: Excluded — contains "Won" as a category (99.4% win rate when Stage=Won); target embedded in feature
+  - **Margin/Turnover**: Missing only for Lost — potential leakage; kept but monitored
 - **Class Distribution**: 70.5% Lost / 29.5% Won → Used `class_weight='balanced'`
 - **Missing Values**: Created indicator features for informative missingness
 - **Temporal Check**: Verified date ranges (no temporal leakage)
@@ -49,7 +51,7 @@
   - Target encoding for high-cardinality IDs (RegionID, MainCountryID, MainDonorID)
 - **Text Fields**: Created count features for Working Areas and Sustainability Criteria
 - **Missing Values**: Median imputation + indicator features
-- **Final Feature Count**: [X] features
+- **Final Feature Count**: 16 features (after train/test column alignment)
 
 ### Key Points:
 - Justify encoding choices (target encoding prevents high dimensionality)
@@ -65,13 +67,13 @@
   - Logistic Regression (baseline, interpretable)
   - Random Forest (good performance, feature importance)
   - Gradient Boosting (strong performance)
-- **Best Model**: [Model Name] with CV F1-Score: [X.XX]
-- **Performance Metrics**:
-  - F1-Score: [X.XX]
-  - Precision: [X.XX]
-  - Recall: [X.XX]
+- **Best Model**: Random Forest with CV F1-Score: 0.80
+- **Performance Metrics** (Random Forest):
+  - CV F1-Score: 0.80 (±0.05)
+  - Train F1-Score: 0.85
+  - Precision: 0.79, Recall: 0.93
   - Confusion Matrix visualization
-- **Top Features**: [List top 3-5 most important features]
+- **Top Features**: MainDonorID_encoded, Working Areas_encoded, Working Areas_count, Working Areas_present, Start_year
 
 ### Key Points:
 - Show model comparison table
@@ -85,16 +87,15 @@
 
 ### Content:
 - **Key Insights**:
-  - [Top 3 insights from feature importance, e.g., "Consortium participation increases win probability"]
-  - [Business-relevant finding]
-  - [Actionable recommendation]
+  - Donor matters: MainDonorID is top feature — certain donors have higher win rates
+  - Working Areas presence strongly predictive: 67.7% missing for Lost vs 15.2% for Won — documenting working areas correlates with winning
+  - Start year and contract value (Turnover, Margin) contribute to predictions
 - **Limitations**:
-  - Small dataset → used regularization to prevent overfitting
-  - Class imbalance → used balanced class weights
+  - Gradient Boosting overfit (Train F1 0.99 vs CV 0.78) — Random Forest chosen for better generalization
+  - Test set dates appear malformed (1970) — temporal features may not generalize
 - **Next Steps**:
-  - Collect more data for improved performance
-  - Monitor Stage and Margin features for potential leakage
-  - Consider ensemble methods if more time available
+  - Exclude Stage from features (add to COLS_TO_EXCLUDE)
+  - Collect more data; consider excluding Turnover/Margin if leakage confirmed
 
 ### Key Points:
 - Translate technical findings to business language
@@ -105,9 +106,9 @@
 
 ## Discussion Points (Be Prepared For):
 
-1. **Why exclude RD Weight?**
-   - It's explicitly described as a prediction tool, not a feature
-   - High correlation would indicate leakage
+1. **Why exclude RD Weight and Stage?**
+   - RD Weight: Explicitly a "win probability estimate"; correlation 0.71 with Status
+   - Stage: Contains "Won" as a category — the target is embedded in the feature (99.4% win rate when Stage=Won)
 
 2. **Why F1-Score over Accuracy?**
    - Class imbalance makes accuracy misleading
