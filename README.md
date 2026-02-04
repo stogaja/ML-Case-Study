@@ -14,13 +14,13 @@ This repository contains a complete solution for predicting whether a project op
 ## Repository Structure
 
 ```
-├── ml_case_study_solution.ipynb    # Main Jupyter notebook (complete solution)
-├── ml_case_study_script.py          # Standalone Python script (reproducible)
-├── predictions.csv                  # Final predictions (generated after running)
-├── PHASE1_Problem_Framing.md        # Detailed Phase 1 guide
-├── Presentation_Outline.md          # 4-5 slide presentation outline
-├── Explanation_Notes.md            # Detailed reasoning behind decisions
-└── README.md                        # This file
+├── ml_case_study_solution.ipynb    
+├── ml_case_study_script.py         
+├── predictions.csv                  
+├── PHASE1_Problem_Framing.md       
+├── Presentation_Outline.md          
+├── Explanation_Notes.md            
+└── README.md                      
 ```
 
 ---
